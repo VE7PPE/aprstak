@@ -15,8 +15,6 @@ import android.content.Context;
 import android.content.res.Configuration;
 import com.atakmap.coremap.log.Log;
 
-import utils.AprsUtility;
-
 public class PluginLifecycle implements Lifecycle {
 
     private final Context pluginContext;

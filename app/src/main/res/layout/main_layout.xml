@@ -35,7 +35,7 @@
         </LinearLayout>
         <Button
             android:id="@+id/viewAPRSLog"
-            android:text="View APRSDroid Log (TBD)"
+            android:text="View APRSDroid Log"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             style="@style/darkButton"
@@ -45,33 +45,51 @@
         <Switch
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:text="Use APRSDroid TNC"
+            android:text="Enable APRSDroid TNC"
             android:id="@+id/TNC"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:checked="false"/>
-        <!--
-                <EditText
-                    android:id="@+id/frequency"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginRight="10dp"
-                    android:background="@color/white"
-                    android:ems="10"
-                    android:hint="Set APRS Frequency field"
-                    android:inputType="textPersonName"
-                    android:textColor="#000000" />
-        -->
-
         <Switch
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:text="Auto Beacon"
-            android:id="@+id/autoBroadcast"
+            android:text="Enable Encryption"
+            android:id="@+id/PSKSwitch"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:checked="false"/>
+        <EditText
+            android:id="@+id/PSKET"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="@color/white"
+            android:ems="10"
+            android:hint="Enter Encryption Password"
+            android:inputType="textPersonName"
+            android:textColor="#000000" />
+        <EditText
+            android:id="@+id/frequency"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="@color/white"
+            android:ems="10"
+            android:hint="Set APRS Frequency field"
+            android:inputType="textPersonName"
+            android:textColor="#000000"
+            android:visibility="invisible"/>
+        <Switch
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:text="Enable Auto Beacon"
+            android:id="@+id/autoBroadcast"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:checked="false"
+            android:visibility="invisible"/>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -84,14 +102,17 @@
                 android:layout_width="wrap_content"
                 android:text="Auto Beacon Interval\n(in minutes)"
                 android:textColor="@color/white"
-                android:textSize="20sp" />
+                android:textSize="20sp"
+                android:visibility="invisible"/>
             <NumberPicker
                 android:layout_marginRight="10dp"
                 android:layout_marginLeft="10dp"
                 android:id="@+id/autoBroadcastInterval"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:visibility="invisible"/>
         </LinearLayout>
+
     </LinearLayout>
 </ScrollView>
 

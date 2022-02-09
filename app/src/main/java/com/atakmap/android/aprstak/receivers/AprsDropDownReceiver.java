@@ -1,23 +1,20 @@
 
 package com.atakmap.android.aprstak.receivers;
 
-import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 
+import android.widget.EditText;
 import android.widget.NumberPicker;
 import android.widget.Switch;
-
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
+import android.widget.TextView;
 
 import com.atakmap.android.aprstak.plugin.PluginLifecycle;
 import com.atakmap.android.dropdown.DropDownReceiver;
@@ -42,13 +39,16 @@ public class AprsDropDownReceiver extends DropDownReceiver implements
     private final View mainView;
     private final Context pluginContext;
     private MapView mapView;
-    private AprsUtility modemCotUtility;
+    private AprsUtility aprsUtility;
 
     private Switch autoBroadcastSwitch;
     private Switch enableTNCSwitch;
+    private Switch enablePSKSwitch;
     private NumberPicker autoBroadcastNPInterval;
 
     private Button viewAPRSLog;
+    private TextView frequencyText;
+    private EditText PSKTV;
     /**************************** CONSTRUCTOR *****************************/
 
     public AprsDropDownReceiver(final MapView mapView,
@@ -66,7 +66,11 @@ public class AprsDropDownReceiver extends DropDownReceiver implements
 
         // TNC
         enableTNCSwitch = mainView.findViewById(R.id.TNC);
-        //frequencyText = mainView.findViewById(R.id.frequency);
+        frequencyText = mainView.findViewById(R.id.frequency);
+
+        // PSK
+        enablePSKSwitch = mainView.findViewById(R.id.PSKSwitch);
+        PSKTV = mainView.findViewById(R.id.PSKET);
     }
 
     /**************************** PUBLIC METHODS *****************************/
@@ -94,21 +98,12 @@ public class AprsDropDownReceiver extends DropDownReceiver implements
                 }
             });
 
-            /*
-                Start listener
-             */
-            if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions((Activity) context, new String[]{Manifest.permission.RECORD_AUDIO}, 1234);
-            }
-
-            modemCotUtility = AprsUtility.getInstance(mapView, pluginContext);
-
+            aprsUtility = AprsUtility.getInstance(mapView, pluginContext);
 
             enableTNCSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                     AprsUtility.useTNC = b;
-
                     SharedPreferences sharedPref = PluginLifecycle.activity.getSharedPreferences("aprs-prefs", Context.MODE_PRIVATE);
                     SharedPreferences.Editor editor = sharedPref.edit();
                     editor.putBoolean("useTNC", b);
@@ -116,25 +111,60 @@ public class AprsDropDownReceiver extends DropDownReceiver implements
                 }
             });
 
-            if (modemCotUtility.useTNC) {
+            if (aprsUtility.useTNC) {
                 enableTNCSwitch.setChecked(true);
 
-                if (!modemCotUtility.aprsdroid_running) {
+                if (!aprsUtility.aprsdroid_running) {
                     // make sure APRSDroid is running
                     Intent i = new Intent("org.aprsdroid.app.SERVICE").setPackage("org.aprsdroid.app");
                     PluginLifecycle.activity.getApplicationContext().startForegroundService(i);
                 }
             } else {
                 enableTNCSwitch.setChecked(false);
-                /*
-                if (modemCotUtility.aprsdroid_running) {
+                if (aprsUtility.aprsdroid_running) {
                     // make sure APRSDroid is stopped
                     Intent i = new Intent("org.aprsdroid.app.SERVICE_STOP").setPackage("org.aprsdroid.app");
                     PluginLifecycle.activity.getApplicationContext().startForegroundService(i);
                 }
-                */
+
             }
-/*
+
+            enablePSKSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                    AprsUtility.usePSK = b;
+                    SharedPreferences sharedPref = PluginLifecycle.activity.getSharedPreferences("aprs-prefs", Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPref.edit();
+                    editor.putBoolean("usePSK", b);
+                    editor.apply();
+                }
+            });
+
+            if (aprsUtility.useTNC) {
+                enableTNCSwitch.setChecked(true);
+            } else {
+                enableTNCSwitch.setChecked(false);
+            }
+
+            PSKTV.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                }
+
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    Log.d(TAG, String.format("PSK Text: %s", s.toString()));
+                    SharedPreferences sharedPref = PluginLifecycle.activity.getSharedPreferences("aprs-prefs", Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPref.edit();
+                    editor.putString("PSKText", s.toString());
+                    editor.apply();
+                }
+            });
+
             frequencyText.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -146,29 +176,27 @@ public class AprsDropDownReceiver extends DropDownReceiver implements
 
                 @Override
                 public void afterTextChanged(Editable s) {
-                    if (AprsUtility.aprsdroid_running) {
-                        Log.d(TAG, String.format("APRS Frequency: %s", s.toString()));
-                        Intent i = new Intent("org.aprsdroid.app.FREQUENCY").setPackage("org.aprsdroid.app");
-                        i.putExtra("frequency", s.toString());
-                        PluginLifecycle.activity.getApplicationContext().startForegroundService(i);
-                    }
+                    Log.d(TAG, String.format("APRS Frequency: %s", s.toString()));
+                    Intent i = new Intent("org.aprsdroid.app.FREQUENCY").setPackage("org.aprsdroid.app");
+                    i.putExtra("frequency", s.toString());
+                    PluginLifecycle.activity.getApplicationContext().startForegroundService(i);
                 }
-           });
- */
+            });
+
             autoBroadcastSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                    if (b && !modemCotUtility.isAutoBeaconing()) {
-                        modemCotUtility.startABListener();
+                    if (b && !aprsUtility.isAutoBeaconing()) {
+                        aprsUtility.startABListener();
                         autoBroadcastNPInterval.setEnabled(false);
-                    } else if (modemCotUtility.isAutoBeaconing()) {
-                        modemCotUtility.stopABListener();
+                    } else if (aprsUtility.isAutoBeaconing()) {
+                        aprsUtility.stopABListener();
                         autoBroadcastNPInterval.setEnabled(true);
                     }
                 }
             });
 
-            if (modemCotUtility.isAutoBeaconing()) {
+            if (aprsUtility.isAutoBeaconing()) {
                 autoBroadcastSwitch.setChecked(true);
                 autoBroadcastNPInterval.setEnabled(false);
             } else {
@@ -176,7 +204,7 @@ public class AprsDropDownReceiver extends DropDownReceiver implements
                 autoBroadcastNPInterval.setEnabled(true);
             }
 
-            final String[] delays = new String[]{"1", "5", "10", "15", "30", "60"};
+            final String[] delays = new String[]{"5", "10", "15", "30", "60"};
             autoBroadcastNPInterval.setDisplayedValues(null);
             autoBroadcastNPInterval.setMinValue(0);
             autoBroadcastNPInterval.setMaxValue(delays.length - 1);

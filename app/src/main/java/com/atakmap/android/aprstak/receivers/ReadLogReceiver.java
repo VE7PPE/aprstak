@@ -13,7 +13,6 @@ import com.atakmap.android.dropdown.DropDownReceiver;
 import com.atakmap.android.ipc.AtakBroadcast;
 import com.atakmap.android.maps.MapView;
 
-
 import utils.DropDownManager;
 
 public class ReadLogReceiver extends DropDownReceiver implements DropDown.OnStateListener {
@@ -24,6 +23,8 @@ public class ReadLogReceiver extends DropDownReceiver implements DropDown.OnStat
     private LayoutInflater inflater;
     private View mainView;
     private Intent intent;
+
+    public static TextView aprslog;
 
     public ReadLogReceiver(MapView mapView, Context context) {
         super(mapView);
@@ -41,9 +42,11 @@ public class ReadLogReceiver extends DropDownReceiver implements DropDown.OnStat
             }
         });
 
-        TextView aprslog = mainView.findViewById(R.id.aprslog);
-        aprslog.setText("Not yet supported");
+        aprslog = mainView.findViewById(R.id.aprslog);
+    }
 
+    public static TextView getAprslog() {
+        return aprslog;
     }
 
     @Override

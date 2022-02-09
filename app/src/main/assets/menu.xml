@@ -37,5 +37,6 @@
 
    <button icon='icons/polar_coord.png'
        onClick='actions/polarCoords.xml'/>
-   <button icon="aprs.png" onClick="aprs.xml" />
+
+   <button icon="aprs.png" onClick="aprstak.xml" />
 </menu>

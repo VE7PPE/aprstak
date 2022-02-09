@@ -27,14 +27,6 @@ public class AutoBeacon implements Runnable {
         int delay = sharedPref.getInt("autoBeaconInterval", 1);
         try {
             while(running) {
-                /*
-                if (!modemCotUtility.aprsdroid_running) {
-                    // make sure APRSDroid is running
-                    Intent i = new Intent("org.aprsdroid.app.SERVICE").setPackage("org.aprsdroid.app");
-                    PluginLifecycle.activity.getApplicationContext().startForegroundService(i);
-                    Thread.sleep(1000);
-                }
-                */
                 Log.i(TAG, "APRS-TAK sending one POSITION packet");
                 Intent i = new Intent("org.aprsdroid.app.ONCE").setPackage("org.aprsdroid.app");
                 PluginLifecycle.activity.getApplicationContext().startForegroundService(i);
